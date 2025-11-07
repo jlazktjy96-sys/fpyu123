@@ -1,17 +1,366 @@
-<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n   
-<title>幸运抽奖</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: 'Microsoft YaHei', Arial, sans-serif;\n            background: linear-gradient(135deg, #ff6b6b, #feca57, #ff9ff3);\n            min-height: 100vh;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            overflow: hidden;\n            position: relative;\n        }\n\n        /* 金币背景效果 */\n        .coin {\n            position: absolute;\n            width: 30px;\n            height: 30px;\n            background: radial-gradient(circle, #ffd700, #ffb347);\n            border-radius: 50%;\n            animation: float 3s ease-in-out infinite;\n            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);\n        }\n\n        .coin::before {\n            content: '¥';\n            position: absolute;\n            top: 50%;\n            left: 50%;\n            transform: translate(-50%, -50%);\n            color: #8b4513;\n            font-weight: bold;\n            font-size: 14px;\n        }\n\n        @keyframes float {\n            0%, 100% { transform: translateY(0px) rotate(0deg); }\n            50% { transform: translateY(-20px) rotate(180deg); }\n        }\n\n        /* 主容器 */\n        .container {\n            text-align: center;\n            z-index: 10;\n            position: relative;\n        }\n\n        .title {\n            font-size: 48px;\n            color: #fff;\n            margin-bottom: 30px;\n            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);\n            font-weight: bold;\n        }\n\n        /* 转盘容器 */\n        .wheel-container {\n            position: relative;\n            width: 400px;\n            height: 400px;\n            margin: 0 auto 30px;\n        }\n\n        .wheel {\n            width: 100%;\n            height: 100%;\n            border-radius: 50%;\n            position: relative;\n            overflow: hidden;\n            border: 8px solid #fff;\n            box-shadow: 0 0 20px rgba(0,0,0,0.3);\n            transition: transform 5s cubic-bezier(0.23, 1, 0.32, 1);\n        }\n\n        .wheel-section {\n            position: absolute;\n            width: 50%;\n            height: 50%;\n            transform-origin: right bottom;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            font-weight: bold;\n            font-size: 16px;\n            color: #fff;\n            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);\n        }\n\n        .wheel-section:nth-child(1) {\n            background: #ff6b6b;\n            transform: rotate(0deg);\n        }\n\n        .wheel-section:nth-child(2) {\n            background: #4ecdc4;\n            transform: rotate(45deg);\n        }\n\n        .wheel-section:nth-child(3) {\n            background: #45b7d1;\n            transform: rotate(90deg);\n        }\n\n        .wheel-section:nth-child(4) {\n            background: #96ceb4;\n            transform: rotate(135deg);\n        }\n\n        .wheel-section:nth-child(5) {\n            background: #feca57;\n            transform: rotate(180deg);\n        }\n\n        .wheel-section:nth-child(6) {\n            background: #ff9ff3;\n            transform: rotate(225deg);\n        }\n\n        .wheel-section:nth-child(7) {\n            background: #54a0ff;\n            transform: rotate(270deg);\n        }\n\n        .wheel-section:nth-child(8) {\n            background: #5f27cd;\n            transform: rotate(315deg);\n        }\n\n        .pointer {\n            position: absolute;\n            top: -20px;\n            left: 50%;\n            transform: translateX(-50%);\n            width: 0;\n            height: 0;\n            border-left: 20px solid transparent;\n            border-right: 20px solid transparent;\n            border-top: 40px solid #ff4757;\n            z-index: 100;\n        }\n\n        .spin-button {\n            background: linear-gradient(45deg, #ff6b6b, #ff4757);\n            color: white;\n            border: none;\n            padding: 15px 40px;\n            font-size: 24px;\n            border-radius: 50px;\n            cursor: pointer;\n            box-shadow: 0 5px 15px rgba(0,0,0,0.3);\n            transition: all 0.3s ease;\n            font-weight: bold;\n        }\n\n        .spin-button:hover {\n            transform: translateY(-2px);\n            box-shadow: 0 8px 25px rgba(0,0,0,0.4);\n        }\n\n        .spin-button:disabled {\n            background: #ccc;\n            cursor: not-allowed;\n            transform: none;\n        }\n\n        /* 弹窗样式 */\n        .modal {\n            display: none;\n            position: fixed;\n            z-index: 1000;\n            left: 0;\n            top: 0;\n            width: 100%;\n            height: 100%;\n            background-color: rgba(0,0,0,0.5);\n        }\n\n        .modal-content {\n            background-color: #fff;\n            margin: 15% auto;\n            padding: 30px;\n            border-radius: 15px;\n            width: 400px;\n            text-align: center;\n            box-shadow: 0 10px 30px rgba(0,0,0,0.3);\n            animation: modalShow 0.3s ease-out;\n        }\n\n        @keyframes modalShow {\n            from { opacity: 0; transform: scale(0.8); }\n            to { opacity: 1; transform: scale(1); }\n        }\n\n        .prize-image {\n            width: 200px;\n            height: 200px;\n            border-radius: 10px;\n            margin-bottom: 20px;\n            object-fit: cover;\n            border: 3px solid #ffd700;\n        }\n\n        .prize-name {\n            font-size: 24px;\n            color: #333;\n            margin-bottom: 20px;\n            font-weight: bold;\n        }\n\n        .contact-button {\n            background: linear-gradient(45deg, #4CAF50, #45a049);\n            color: white;\n            border: none;\n            padding: 12px 30px;\n            font-size: 16px;\n            border-radius: 25px;\n            cursor: pointer;\n            transition: all 0.3s ease;\n            text-decoration: none;\n            display: inline-block;\n            margin: 0 10px;\n        }\n\n        .contact-button:hover {\n            transform: translateY(-2px);\n            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);\n        }\n\n        .close-button {\n            background: linear-gradient(45deg, #f44336, #da190b);\n            color: white;\n            border: none;\n            padding: 12px 30px;\n            font-size: 16px;\n            border-radius: 25px;\n            cursor: pointer;\n            transition: all 0.3s ease;\n            margin: 0 10px;\n        }\n\n        .close-button:hover {\n            transform: translateY(-2px);\n            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);\n        }\n    </style>\n</head>\n<body>\n    <!-- 金币背景 -->\n    <div id=\"coin-container\"></div>\n\n    <div class=\"container\">\n        <h1 class=\"title\">🎉 幸运抽奖 🎉</h1>\n        \n        <div class=\"wheel-container\">\n            <div class=\"pointer\"></div>\n            <div class=\"wheel\" id=\"wheel\">\n                <div class=\"wheel-section\">一等奖</div>\n                <div class=\"wheel-section\">二等奖</div>\n                <div class=\"wheel-section\">三等奖</div>\n                <div class=\"wheel-section\">四等奖</div>\n                <div class=\"wheel-section\">五等奖</div>\n                <div class=\"wheel-section\">六等奖</div>\n                <div class=\"wheel-section\">七等奖</div>\n                <div class=\"wheel-section\">八等奖</div>\n            </div>\n        </div>\n\n        <button class=\"spin-button\" id=\"spinButton\" onclick=\"spin()\">开始抽奖</button>\n    </div>\n\n    <!-- 中奖弹窗 -->\n    <div id=\"prizeModal\" class=\"modal\">\n        <div class=\"modal-content\">\n            <img id=\"prizeImage\" class=\"prize-image\" src=\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZmZkNzAwIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNkYWE1MjAiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkYWE1MjAiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K\" alt=\"奖品图片\">\n            <div class=\"prize-name\" id=\"prizeName\">恭喜您获得奖品！</div>\n            <div>\n                <a href=\"#\" id=\"contactLink\" class=\"contact-button\">联系客服领取奖品</a>\n                <button class=\"close-button\" onclick=\"closeModal()\">关闭</button>\n            </div>\n        </div>\n    </div>\n\n    <script>\n        // 创建金币背景\n        function createCoins() {\n            const coinContainer = document.getElementById('coin-container');\n            for (let i = 0; i < 30; i++) {\n                const coin = document.createElement('div');\n                coin.className = 'coin';\n                coin.style.left = Math.random() * 100 + '%';\n                coin.style.top = Math.random() * 100 + '%';\n                coin.style.animationDelay = Math.random() * 3 + 's';\n                coin.style.animationDuration = (Math.random() * 2 + 2) + 's';\n                coinContainer.appendChild(coin);\n            }\n        }\n\n        // 奖品配置\n        const prizes = [\n            { \n                name: '一等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZmZkNzAwIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNkYWE1MjAiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkYWE1MjAiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact1' \n            },\n            { \n                name: '二等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNGRjZGM0IiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMzNmI1YjkiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNmI1YjkiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact2' \n            },\n            { \n                name: '三等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNDViN2QxIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMyOTgwYjkiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyOTgwYjkiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact3' \n            },\n            { \n                name: '四等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjOTZjZWI0IiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiM3NmM3YmQiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM3NmM3YmQiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact4' \n            },\n            { \n                name: '五等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZmVjYTU3IiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNkYWE1MjAiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkYWE1MjAiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact5' \n            },\n            { \n                name: '六等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZmY5ZmYzIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiNkYWE1MjAiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkYWE1MjAiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact6' \n            },\n            { \n                name: '七等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNTRhMGZmIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMzNjkwZjQiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzNjkwZjQiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact7' \n            },\n            { \n                name: '八等奖', \n                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNWYyN2NkIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiM0YjA4OWMiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSI1MCIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0YjA4OWMiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIj7lsIHpnaLlm77niYc8L3RleHQ+Cjwvc3ZnPgo8L3N2Zz4K', \n                contactLink: 'https://example.com/contact8' \n            }\n        ];\n\n        let isSpinning = false;\n\n        // 初始化\n        createCoins();\n\n        // 抽奖函数\n        function spin() {\n            if (isSpinning) return;\n            \n            isSpinning = true;\n            const wheel = document.getElementById('wheel');\n            const button = document.getElementById('spinButton');\n            \n            button.disabled = true;\n            button.textContent = '抽奖中...';\n\n            // 随机选择奖品\n            const randomIndex = Math.floor(Math.random() * prizes.length);\n            const selectedPrize = prizes[randomIndex];\n\n            // 计算旋转角度 (每个奖品占45度)\n            const baseRotation = 360 * 5; // 5圈\n            const prizeRotation = randomIndex * 45;\n            const finalRotation = baseRotation + prizeRotation + 22.5; // 加22.5度使指针指向中间\n\n            // 旋转转盘\n            wheel.style.transform = `rotate(${finalRotation}deg)`;\n\n            // 5秒后显示结果\n            setTimeout(() => {\n                showPrize(selectedPrize);\n                isSpinning = false;\n                button.disabled = false;\n                button.textContent = '开始抽奖';\n            }, 5000);\n        }\n\n        // 显示中奖弹窗\n        function showPrize(prize) {\n            const modal = document.getElementById('prizeModal');\n            const prizeImage = document.getElementById('prizeImage');\n            const prizeName = document.getElementById('prizeName');\n            const contactLink = document.getElementById('contactLink');\n\n            prizeImage.src = prize.image;\n            prizeName.textContent = `恭喜您获得：${prize.name}！`;\n            contactLink.href = prize.contactLink;\n\n            modal.style.display = 'block';\n        }\n\n        // 关闭弹窗\n        function closeModal() {\n            document.getElementById('prizeModal').style.display = 'none';\n        }\n\n        // 点击弹窗外部关闭\n        window.onclick = function(event) {\n            const modal = document.getElementById('prizeModal');\n            if (event.target === modal) {\n                modal.style.display = 'none';\n            }\n        }\n    </script>\n</body>\n</html>","explanation":"将代码重新格式化，每行代码单独成行，提高可读性"},"query_language":"Chinese","thought":"我将重新格式化代码，确保每行代码都单独成行，提高代码的可读性和维护性。"}
-        
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>幸运抽奖活动</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-
+  <!-- 配置Tailwind自定义颜色和字体 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#E63946',
+            secondary: '#FFB703',
+            gold: '#FFD700',
+            darkRed: '#9E2A2B',
+          },
+          fontFamily: {
+            sans: ['Arial', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
   
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .gold-gradient {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      }
+      .red-pattern {
+        background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 20%),
+                          radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 20%);
+      }
+      .prize-item {
+        @apply absolute w-16 h-16 flex items-center justify-center transform bg-white rounded-md shadow-md;
+      }
+      .coin {
+        position: absolute;
+        width: var(--size);
+        height: var(--size);
+        background: gold;
+        border-radius: 50%;
+        opacity: var(--opacity);
+        animation: float var(--duration) infinite ease-in-out;
+        z-index: 1;
+      }
+      .coin::before {
+        content: '$';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #D4AF37;
+        font-weight: bold;
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(1800deg); } /* 5秒转5圈 (1800度) */
+      }
+      .firework {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background-color: #FFD700;
+        border-radius: 50%;
+        opacity: 0;
+      }
+      @keyframes explode {
+        0% { transform: scale(0); opacity: 1; }
+        70% { opacity: 1; }
+        100% { transform: scale(2); opacity: 0; }
+      }
+    }
+  </style>
+</head>
+<body class="bg-darkRed min-h-screen red-pattern overflow-x-hidden relative">
+  <!-- 顶部标题 -->
+  <header class="pt-6 pb-4 px-4 text-center relative z-10">
+    <div class="inline-flex items-center justify-center mb-2">
+      <img src="https://picsum.photos/50/50" alt="Logo" class="w-12 h-12 rounded-full bg-white p-1">
+    </div>
+    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-white">环球慈善基金会</h1>
+  </header>
 
-
-
+  <!-- 主要内容区 -->
+  <main class="max-w-3xl mx-auto px-4 relative z-10">
+    <!-- 抽奖转盘 -->
+    <div class="relative w-full max-w-md mx-auto aspect-square mb-8">
+      <!-- 转盘背景 -->
+      <div class="absolute inset-0 rounded-full bg-white shadow-xl p-4">
+        <!-- 转盘 -->
+        <div id="wheel" class="w-full h-full rounded-full relative overflow-hidden border-8 border-secondary">
+          <!-- 奖品位置（固定不动，后续可自行替换图片） -->
+          <div class="prize-item top-4 left-1/2 -translate-x-1/2">
+            <img src="https://picsum.photos/60/60?random=1" alt="奖品1" class="w-full h-full object-cover rounded">
+          </div>
+          <div class="prize-item top-1/4 right-4 transform -translate-y-1/2">
+            <img src="https://picsum.photos/60/60?random=2" alt="奖品2" class="w-full h-full object-cover rounded">
+          </div>
+          <div class="prize-item bottom-1/4 right-4 transform translate-y-1/2">
+            <img src="https://picsum.photos/60/60?random=3" alt="奖品3" class="w-full h-full object-cover rounded">
+          </div>
+          <div class="prize-item bottom-4 left-1/2 -translate-x-1/2">
+            <img src="https://picsum.photos/60/60?random=4" alt="奖品4" class="w-full h-full object-cover rounded">
+          </div>
+          <div class="prize-item bottom-1/4 left-4 transform translate-y-1/2">
+            <img src="https://picsum.photos/60/60?random=5" alt="奖品5" class="w-full h-full object-cover rounded">
+          </div>
+          <div class="prize-item top-1/4 left-4 transform -translate-y-1/2">
+            <img src="https://picsum.photos/60/60?random=6" alt="奖品6" class="w-full h-full object-cover rounded">
+          </div>
           
- 
+          <!-- 转盘分割线 -->
+          <div class="absolute inset-0">
+            <div class="absolute top-0 left-1/2 w-0.5 h-full bg-secondary/30 -translate-x-1/2"></div>
+            <div class="absolute top-1/4 right-0 w-1/2 h-0.5 bg-secondary/30 -translate-y-1/2"></div>
+            <div class="absolute bottom-1/4 right-0 w-1/2 h-0.5 bg-secondary/30 translate-y-1/2"></div>
+            <div class="absolute top-1/4 left-0 w-1/2 h-0.5 bg-secondary/30 -translate-y-1/2"></div>
+            <div class="absolute bottom-1/4 left-0 w-1/2 h-0.5 bg-secondary/30 translate-y-1/2"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 中心按钮 -->
+      <button id="startBtn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-primary text-white font-bold text-lg shadow-lg z-10 flex items-center justify-center transform transition-transform hover:scale-110 active:scale-95">
+        开始
+      </button>
+      
+      <!-- 指针 -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-12 bg-secondary z-20 clip-path polygon(50% 0%, 0% 100%, 100% 100%)"></div>
+    </div>
+    
+    <!-- 参与人数 -->
+    <div class="text-center mb-6">
+      <p class="text-white text-lg font-medium bg-primary/70 inline-block px-6 py-2 rounded-full">
+        已有 2227 人参与
+      </p>
+    </div>
+    
+    <!-- 奖品展示 -->
+    <div class="bg-white rounded-xl p-6 shadow-lg mb-8">
+      <h2 class="text-xl font-bold text-darkRed mb-4 border-b pb-2">活动奖品</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="flex flex-col items-center p-3 border rounded-lg hover:shadow-md transition-shadow">
+          <img src="https://picsum.photos/100/100?random=10" alt="奖品" class="w-20 h-20 object-cover rounded mb-2">
+          <span class="text-sm text-center">精美耳机</span>
+        </div>
+        <div class="flex flex-col items-center p-3 border rounded-lg hover:shadow-md transition-shadow">
+          <img src="https://picsum.photos/100/100?random=11" alt="奖品" class="w-20 h-20 object-cover rounded mb-2">
+          <span class="text-sm text-center">家用电器</span>
+        </div>
+        <div class="flex flex-col items-center p-3 border rounded-lg hover:shadow-md transition-shadow">
+          <img src="https://picsum.photos/100/100?random=12" alt="奖品" class="w-20 h-20 object-cover rounded mb-2">
+          <span class="text-sm text-center">数码产品</span>
+        </div>
+        <div class="flex flex-col items-center p-3 border rounded-lg hover:shadow-md transition-shadow">
+          <img src="https://picsum.photos/100/100?random=13" alt="奖品" class="w-20 h-20 object-cover rounded mb-2">
+          <span class="text-sm text-center">粮油礼包</span>
+        </div>
+        <div class="flex flex-col items-center p-3 border rounded-lg hover:shadow-md transition-shadow">
+          <img src="https://picsum.photos/100/100?random=14" alt="奖品" class="w-20 h-20 object-cover rounded mb-2">
+          <span class="text-sm text-center">零食礼盒</span>
+        </div>
+        <div class="flex flex-col items-center p-3 border rounded-lg hover:shadow-md transition-shadow">
+          <img src="https://picsum.photos/100/100?random=15" alt="奖品" class="w-20 h-20 object-cover rounded mb-2">
+          <span class="text-sm text-center">现金红包</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 活动规则 -->
+    <div class="bg-white rounded-xl p-6 shadow-lg mb-8">
+      <h2 class="text-xl font-bold text-darkRed mb-4 border-b pb-2">活动规则</h2>
+      <ul class="text-sm space-y-2">
+        <li class="flex items-start">
+          <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+          <span>每个用户限参与一次抽奖活动</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+          <span>抽奖结果即时公布，中奖用户请在7天内联系客服领取</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+          <span>实物奖品将在确认收货信息后15个工作日内寄出</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+          <span>本活动最终解释权归主办方所有</span>
+        </li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="text-center text-white/70 text-sm py-4 relative z-10">
+    <p>© 2023 环球慈善基金会 版权所有</p>
+  </footer>
+
+  <!-- 中奖弹窗 -->
+  <div id="resultModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+      <div class="bg-primary text-white p-4 text-center">
+        <h3 class="text-xl font-bold">恭喜您中奖了！</h3>
+      </div>
+      <div class="p-6 text-center">
+        <div class="mb-4">
+          <img id="prizeImage" src="https://picsum.photos/200/200?random=20" alt="中奖奖品" class="w-40 h-40 object-cover rounded-lg mx-auto border-4 border-gold">
+        </div>
+        <h4 id="prizeName" class="text-xl font-bold text-darkRed mb-6">精美耳机一副</h4>
+        <a href="https://example.com/service" target="_blank" class="inline-block bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full transition-colors">
+          联系客服领取奖品
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 创建金币效果
+    function createCoins() {
+      const container = document.body;
+      const coinCount = 30; // 金币数量
+      
+      for (let i = 0; i < coinCount; i++) {
+        const coin = document.createElement('div');
+        coin.classList.add('coin');
+        
+        // 随机属性
+        const size = Math.random() * 20 + 10;
+        const opacity = Math.random() * 0.7 + 0.3;
+        const duration = Math.random() * 5 + 3;
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        const delay = Math.random() * 5;
+        
+        // 设置样式
+        coin.style.setProperty('--size', `${size}px`);
+        coin.style.setProperty('--opacity', opacity);
+        coin.style.setProperty('--duration', `${duration}s`);
+        coin.style.left = `${left}%`;
+        coin.style.top = `${top}%`;
+        coin.style.animationDelay = `${delay}s`;
+        
+        container.appendChild(coin);
+      }
+    }
+    
+    // 创建烟花效果
+    function createFireworks() {
+      const container = document.body;
+      const fireworkCount = 5;
+      
+      for (let i = 0; i < fireworkCount; i++) {
+        const firework = document.createElement('div');
+        firework.classList.add('firework');
+        
+        // 随机位置和动画
+        const left = Math.random() * 100;
+        const top = Math.random() * 50 + 10;
+        const size = Math.random() * 4 + 2;
+        const delay = Math.random() * 2;
+        
+        firework.style.left = `${left}%`;
+        firework.style.top = `${top}%`;
+        firework.style.width = `${size}px`;
+        firework.style.height = `${size}px`;
+        firework.style.animation = `explode 1s ease-out ${delay}s forwards`;
+        
+        container.appendChild(firework);
+        
+        // 移除烟花元素
+        setTimeout(() => {
+          firework.remove();
+        }, 2000);
+      }
+    }
+    
+    // 初始化抽奖功能
+    function initLottery() {
+      const wheel = document.getElementById('wheel');
+      const startBtn = document.getElementById('startBtn');
+      const resultModal = document.getElementById('resultModal');
+      const prizeImage = document.getElementById('prizeImage');
+      const prizeName = document.getElementById('prizeName');
+      
+      // 奖品列表
+      const prizesList = [
+        { name: "精美耳机一副", image: "https://picsum.photos/200/200?random=20" },
+        { name: "智能手表一个", image: "https://picsum.photos/200/200?random=21" },
+        { name: "家用电器一套", image: "https://picsum.photos/200/200?random=22" },
+        { name: "50元现金红包", image: "https://picsum.photos/200/200?random=23" },
+        { name: "粮油大礼包", image: "https://picsum.photos/200/200?random=24" },
+        { name: "零食礼盒一份", image: "https://picsum.photos/200/200?random=25" }
+      ];
+      
+      let isSpinning = false;
+      
+      startBtn.addEventListener('click', () => {
+        if (isSpinning) return;
+        
+        isSpinning = true;
+        startBtn.disabled = true;
+        startBtn.textContent = "抽奖中...";
+        
+        // 随机选择一个奖品
+        const randomPrizeIndex = Math.floor(Math.random() * prizeList.length);
+        const selectedPrize = prizeList[randomPrizeIndex];
+        
+        // 计算旋转角度（5秒转5圈 + 随机位置）
+        const baseRotation = 1800; // 5圈
+        const prizeRotation = 60 * randomPrizeIndex; // 每个奖品60度
+        const totalRotation = baseRotation + prizeRotation;
+        
+        // 设置旋转动画
+        wheel.style.transition = "transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99)";
+        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        
+        // 抽奖结束后显示结果
+        setTimeout(() => {
+          // 更新弹窗内容
+          prizeName.textContent = selectedPrize.name;
+          prizeImage.src = selectedPrize.image;
+          
+          // 显示弹窗
+          resultModal.classList.remove('hidden');
+          
+          // 创建烟花效果
+          createFireworks();
+          
+          // 重置按钮状态
+          startBtn.disabled = false;
+          startBtn.textContent = "开始";
+          isSpinning = false;
+        }, 5000); // 5秒后显示结果
+      });
+      
+      // 点击弹窗外部关闭弹窗
+      resultModal.addEventListener('click', (e) => {
+        if (e.target === resultModal) {
+          resultModal.classList.add('hidden');
+        }
+      });
+    }
+    
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      createCoins();
+      initLottery();
+    });
+  </script>
+</body>
 </html>
-
-
 
 
 
