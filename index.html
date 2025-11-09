@@ -461,430 +461,179 @@
         setInterval(createCoin, 2000);
     </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>幸运大转盘</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  
-  <!-- 配置Tailwind -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#E61E2B',
-            secondary: '#FFC633',
-            gold: '#FFD700',
-            darkRed: '#C41E3A'
-          },
-          fontFamily: {
-            sans: ['Arial', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .text-shadow {
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      }
-      .rotate-wheel {
-        transition: transform 5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-      }
-      .coin-float {
-        animation: float 4s ease-in-out infinite;
-      }
-      .packet-swing {
-        animation: swing 6s ease-in-out infinite;
-      }
-      .firework {
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        opacity: 0;
-      }
-      .confetti {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        opacity: 0;
-      }
-    }
-    
-    @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(5deg); }
-      100% { transform: translateY(0) rotate(0deg); }
-    }
-    
-    @keyframes swing {
-      0% { transform: rotate(-5deg); }
-      50% { transform: rotate(5deg); }
-      100% { transform: rotate(-5deg); }
-    }
-    
-    @keyframes explode {
-      0% { transform: scale(0); opacity: 1; }
-      70% { opacity: 1; }
-      100% { transform: scale(3); opacity: 0; }
-    }
-    
-    @keyframes fall {
-      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-    }
-    
-    .prize-section {
-      position: absolute;
-      width: 50%;
-      height: 50%;
-      transform-origin: bottom right;
-      overflow: hidden;
-    }
-    
-    .prize-content {
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .prize-info {
-      transform: rotate(45deg) translate(0, -60%);
-      width: 60px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body class="bg-primary min-h-screen overflow-x-hidden relative">
-  <!-- 背景装饰元素 -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <!-- 金币装饰 -->
-    <div class="coin absolute top-[10%] right-[15%] w-16 h-16 rounded-full bg-gold coin-float flex items-center justify-center text-yellow-700">
-      <i class="fa fa-yen text-xl"></i>
-    </div>
-    <div class="coin absolute top-[25%] right-[5%] w-12 h-12 rounded-full bg-gold coin-float flex items-center justify-center text-yellow-700" style="animation-delay: 0.5s">
-      <i class="fa fa-yen"></i>
-    </div>
-    <div class="coin absolute bottom-[30%] left-[10%] w-14 h-14 rounded-full bg-gold coin-float flex items-center justify-center text-yellow-700" style="animation-delay: 1s">
-      <i class="fa fa-yen text-lg"></i>
-    </div>
-    <div class="coin absolute top-[40%] left-[5%] w-10 h-10 rounded-full bg-gold coin-float flex items-center justify-center text-yellow-700" style="animation-delay: 1.5s">
-      <i class="fa fa-yen"></i>
-    </div>
-    <div class="coin absolute bottom-[15%] right-[20%] w-12 h-12 rounded-full bg-gold coin-float flex items-center justify-center text-yellow-700" style="animation-delay: 0.8s">
-      <i class="fa fa-yen"></i>
-    </div>
-    
-    <!-- 红包装饰 -->
-    <div class="packet-swing absolute top-[15%] left-[10%] text-red-600">
-      <i class="fa fa-envelope text-3xl"></i>
-    </div>
-    <div class="packet-swing absolute bottom-[20%] right-[15%] text-red-700" style="animation-delay: 1s">
-      <i class="fa fa-envelope text-2xl"></i>
-    </div>
-    
-    <!-- 烟花装饰 -->
-    <div class="absolute top-[5%] left-[5%] text-yellow-300 text-3xl">
-      <i class="fa fa-star"></i>
-    </div>
-    <div class="absolute top-[8%] right-[20%] text-yellow-300 text-2xl">
-      <i class="fa fa-star"></i>
-    </div>
-    
-    <!-- 底部金币堆 -->
-    <div class="absolute bottom-0 left-0 w-1/3 h-24 bg-gradient-to-t from-gold/40 to-transparent"></div>
-    <div class="absolute bottom-0 right-0 w-1/3 h-24 bg-gradient-to-t from-gold/40 to-transparent"></div>
-  </div>
-  
-  <!-- 动画容器 -->
-  <div id="fireworks-container" class="absolute inset-0 pointer-events-none z-10"></div>
-  <div id="confetti-container" class="absolute inset-0 pointer-events-none z-10"></div>
-
-  <div class="container mx-auto px-4 py-8 relative z-20">
-    <!-- 标题区域 -->
-    <div class="text-center mb-4">
-      <h1 class="text-[clamp(2rem,6vw,4rem)] font-extrabold text-secondary text-shadow leading-none">
-        幸运大转盘
-      </h1>
-      <p class="text-white text-[clamp(1rem,3vw,1.5rem)] font-bold mt-1">BEST LUCKY</p>
-    </div>
-    
-    <!-- 转盘区域 -->
-    <div class="max-w-md mx-auto mb-6 relative">
-      <!-- 转盘容器 -->
-      <div class="w-full aspect-square relative">
-        <!-- 转盘外框 -->
-        <div class="absolute inset-0 rounded-full bg-secondary shadow-2xl"></div>
-        
-        <!-- 转盘内部 - 可旋转部分 -->
-        <div id="wheel" class="absolute inset-[5%] rounded-full overflow-hidden rotate-wheel">
-          <!-- 奖品区域（8个分区，每个45度） -->
-          <div class="prize-section" style="transform: rotate(0deg);">
-            <div class="prize-content bg-white">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=1" alt="体验品1份" class="w-8 h-8 mx-auto mb-1">
-                <span>体验品1份</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(45deg);">
-            <div class="prize-content bg-[#FFF0F0]">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=2" alt="满50减20" class="w-8 h-8 mx-auto mb-1">
-                <span>满50减20</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(90deg);">
-            <div class="prize-content bg-white">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=3" alt="免费商品" class="w-8 h-8 mx-auto mb-1">
-                <span>免费商品</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(135deg);">
-            <div class="prize-content bg-[#FFF0F0]">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=4" alt="谢谢参与" class="w-8 h-8 mx-auto mb-1">
-                <span>谢谢参与</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(180deg);">
-            <div class="prize-content bg-white">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=5" alt="银饰9折" class="w-8 h-8 mx-auto mb-1">
-                <span>银饰9折</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(225deg);">
-            <div class="prize-content bg-[#FFF0F0]">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=6" alt="iPhone手机" class="w-8 h-8 mx-auto mb-1">
-                <span>iPhone手机</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(270deg);">
-            <div class="prize-content bg-white">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=7" alt="10元影券" class="w-8 h-8 mx-auto mb-1">
-                <span>10元影券</span>
-              </div>
-            </div>
-          </div>
-          <div class="prize-section" style="transform: rotate(315deg);">
-            <div class="prize-content bg-[#FFF0F0]">
-              <div class="prize-info">
-                <img src="https://picsum.photos/40/40?random=8" alt="5元话费" class="w-8 h-8 mx-auto mb-1">
-                <span>5元话费</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 中心按钮 -->
-        <button id="start-btn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-primary hover:bg-darkRed text-white rounded-full shadow-lg flex flex-col items-center justify-center z-10 transition-all duration-300 active:scale-95">
-          <span class="text-lg font-bold">开始</span>
-          <span class="text-xs">抽奖</span>
-        </button>
-        
-        <!-- 指针 -->
-        <div class="absolute top-[-10px] left-1/2 transform -translate-x-1/2 z-20">
-          <div class="w-8 h-12 bg-primary relative">
-            <div class="absolute top-[-8px] left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary rotate-45"></div>
-            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[16px] border-r-[16px] border-t-[16px] border-l-transparent border-r-transparent border-t-primary"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 参与人数 -->
-    <div class="text-center mb-6">
-      <div class="inline-block bg-secondary text-primary px-6 py-2 rounded-full font-bold">
-        已有 2224 人参与
-      </div>
-    </div>
-    
-    <!-- 奖品展示区 -->
-    <div class="bg-white rounded-xl overflow-hidden max-w-2xl mx-auto shadow-lg mb-8">
-      <!-- 标签页导航 -->
-      <div class="flex border-b">
-        <button id="prizes-tab" class="flex-1 py-3 px-4 bg-primary text-white font-bold">活动奖品</button>
-        <button id="rules-tab" class="flex-1 py-3 px-4 bg-gray-100 text-gray-600">抽奖规则</button>
-        <button id="winners-tab" class="flex-1 py-3 px-4 bg-gray-100 text-gray-600">中奖名单</button>
-      </div>
-      
-      <!-- 活动奖品内容 -->
-      <div id="prizes-content" class="p-4">
-        <div class="grid grid-cols-3 gap-4">
-          <div class="flex flex-col items-center p-2">
-            <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/fc1304df6ce14d488f1ac825b4b6d0a5.png~tplv-a9rns2rl98-24:720:720.png?rcl=202511072141222E250392218457FA9325&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763127682&x-signature=%2BuAFojo9cNYya%2BeUrQXE5f4NqPM%3D" alt="iPhone手机" class="w-16 h-16 object-contain mb-1">
-            <span class="text-xs text-center">iPhone手机</span>
-          </div>
-          <div class="flex flex-col items-center p-2">
-            <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/e023da6ef6c64f3d85cff949b67ffa43.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251107220719115ED2B990D217ABE090&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763129240&x-signature=mzzhlgcjHzehgidRAhjQyP9%2FuT4%3D" alt="免费平衡车" class="w-16 h-16 object-contain mb-1">
-            <span class="text-xs text-center">免费平衡车</span>
-          </div>
-          <div class="flex flex-col items-center p-2">
-            <img src="https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/36bb55bbef6c40f98feb6f90011275b0.png~tplv-a9rns2rl98-24:720:720.png?rcl=2025110722150232E20EA73116650BD07D&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763129702&x-signature=yqUPqCdMrMNWwTcZ9%2FJ6ZQEr5OA%3D" alt="耳机1付" class="w-16 h-16 object-contain mb-1">
-            <span class="text-xs text-center">耳机1付</span>
-          </div>
-          <div class="flex flex-col items-center p-2">
-            <img src="https://picsum.photos/80/80?random=10" alt="充电宝" class="w-16 h-16 object-contain mb-1">
-            <span class="text-xs text-center">充电宝1个</span>
-          </div>
-          <div class="flex flex-col items-center p-2">
-            <img src="https://picsum.photos/80/80?random=11" alt="电脑" class="w-16 h-16 object-contain mb-1">
-            <span class="text-xs text-center">立减50元</span>
-          </div>
-          <div class="flex flex-col items-center p-2">
-            <img src="https://picsum.photos/80/80?random=12" alt="音箱" class="w-16 h-16 object-contain mb-1">
-            <span class="text-xs text-center">音箱1个</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 抽奖规则内容 -->
-      <div id="rules-content" class="p-4 hidden">
-        <ul class="space-y-2 text-sm text-gray-700">
-          <li class="flex items-start">
-            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-            <span>每个用户每天可参与1次抽奖</span>
-          </li>
-          <li class="flex items-start">
-            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-            <span>中奖后请在7天内联系客服领取奖品</span>
-          </li>
-          <li class="flex items-start">
-            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-            <span>实物奖品将在确认收货信息后15个工作日内寄出</span>
-          </li>
-          <li class="flex items-start">
-            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-            <span>本活动最终解释权归主办方所有</span>
-          </li>
-        </ul>
-      </div>
-      
-      <!-- 中奖名单内容 -->
-      <div id="winners-content" class="p-4 hidden">
-        <ul class="space-y-2 text-sm text-gray-700">
-          <li class="flex justify-between pb-2 border-b">
-            <span>张先生 <span class="text-gray-500">138****5678</span></span>
-            <span>耳机1付</span>
-          </li>
-          <li class="flex justify-between pb-2 border-b">
-            <span>李女士 <span class="text-gray-500">139****1234</span></span>
-            <span>5元话费</span>
-          </li>
-          <li class="flex justify-between pb-2 border-b">
-            <span>王先生 <span class="text-gray-500">135****8901</span></span>
-            <span>满50减20</span>
-          </li>
-          <li class="flex justify-between pb-2 border-b">
-            <span>赵女士 <span class="text-gray-500">136****2345</span></span>
-            <span>体验品1份</span>
-          </li>
-          <li class="flex justify-between">
-            <span>陈先生 <span class="text-gray-500">137****6789</span></span>
-            <span>10元影券</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 中奖结果弹窗 -->
-  <div id="result-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full mx-4 overflow-hidden shadow-2xl transform transition-all">
-      <div class="bg-primary text-white p-4 text-center relative">
-        <h3 class="text-xl font-bold">恭喜您中奖了！</h3>
-        <button id="close-modal" class="absolute top-3 right-3 text-white hover:text-secondary">
-          <i class="fa fa-times"></i>
-        </button>
-      </div>
-      <div class="p-6 text-center">
-        <div class="mb-4">
-          <img id="prize-img" src="" alt="中奖奖品" class="w-32 h-32 object-contain mx-auto">
-        </div>
-        <h4 id="prize-name" class="text-xl font-bold text-primary mb-6"></h4>
-        <!-- 联系客服领取按钮 -->
-        <a href="https://您的客服页面链接" target="_blank" class="inline-block bg-primary hover:bg-darkRed text-white font-bold py-3 px-8 rounded-full transition-colors">
-          联系客服领取奖品
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // 奖品数据
-    const prizes = [
-      { id: 1, name: "体验品1份", image: "https://picsum.photos/120/120?random=20" },
-      { id: 2, name: "满50减20", image: "https://picsum.photos/120/120?random=21" },
-      { id: 3, name: "免费商品", image: "https://picsum.photos/120/120?random=22" },
-      { id: 4, name: "谢谢参与", image: "https://picsum.photos/120/120?random=23" },
-      { id: 5, name: "银饰9折", image: "https://picsum.photos/120/120?random=24" },
-      { id: 6, name: "iPhone手机", image: "https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/fc1304df6ce14d488f1ac825b4b6d0a5.png~tplv-a9rns2rl98-24:720:720.png?rcl=202511072141222E250392218457FA9325&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763127682&x-signature=%2BuAFojo9cNYya%2BeUrQXE5f4NqPM%3D" },
-      { id: 7, name: "10元影券", image: "https://picsum.photos/120/120?random=26" },
-      { id: 8, name: "5元话费", image: "https://picsum.photos/120/120?random=27" }
-    ];
-    
-    // DOM元素
-    const wheel = document.getElementById('wheel');
-    const startBtn = document.getElementById('start-btn');
-    const resultModal = document.getElementById('result-modal');
-    const closeModal = document.getElementById('close-modal');
-    const prizeImg = document.getElementById('prize-img');
-    const prizeName = document.getElementById('prize-name');
-    const fireworksContainer = document.getElementById('fireworks-container');
-    const confettiContainer = document.getElementById('confetti-container');
-    
-    // 标签页元素
-    const prizesTab = document.getElementById('prizes-tab');
-    const rulesTab = document.getElementById('rules-tab');
-    const winnersTab = document.getElementById('winners-tab');
-    const prizesContent = document.getElementById('prizes-content');
-    const rulesContent = document.getElementById('rules-content');
-    const winnersContent = document.getElementById('winners-content');
-    
-    // 状态变量
-    let isSpinning = false;
-    let currentRotation = 0;
-    
-    // 创建烟花效果
-    function createFireworks() {
-      // 清除现有烟花
-      fireworksContainer.innerHTML = '';
-      
-      // 创建10个烟花
-      for (let i = 0; i < 10; i++) {
-        const firework = document.createElement('div');
-        firework.classList.add('firework');
-        
-        // 随机位置和颜色
-        const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#FFA07A', '#C8E6C9'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const x = Math.random() * 100;
-        const y = Math.random() * 60 + 10;
-        
-        firework.style.left = `${x}%`;
-        firework.style.top = `${y}%`;
-
+</html>
++        /* 响应式设计 */
++        @media (max-width: 768px) {
++            .wheel-container {
++                width: 300px;
++                height: 300px;
++            }
++
++            .header-title {
++                font-size: 2.2em;
++            }
++
++            .sub-title {
++                font-size: 1.2em;
++            }
++
++            .modal-content {
++                width: 90%;
++                margin: 25% auto;
++                padding: 20px;
++            }
++
++            .prize-image {
++                width: 100px;
++                height: 100px;
++            }
++        }
++    </style>
++</head>
++<body>
++    <!-- 星星背景 -->
++    <div class="star"></div>
++    <div class="star"></div>
++    <div class="star"></div>
++    <div class="star"></div>
++
++    <!-- 金币背景 -->
++    <div class="coin">¥</div>
++    <div class="coin">¥</div>
++    <div class="coin">¥</div>
++    <div class="coin">¥</div>
++    <div class="coin">¥</div>
++
++    <div class="container">
++        <h1 class="header-title">幸运大转盘</h1>
++        <p class="sub-title">★ BEST LUCK ★</p>
++        
++        <div class="wheel-container">
++            <div class="pointer" onclick="spin()">开始</div>
++            <div class="wheel" id="wheel">
++                <div class="wheel-section">
++                    <span>一等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>二等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>三等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>四等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>五等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>六等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>七等奖</span>
++                </div>
++                <div class="wheel-section">
++                    <span>八等奖</span>
++                </div>
++            </div>
++        </div>
++
++        <div class="info-box">
++            已有 <span id="participantCount">2224</span> 人参与
++        </div>
++    </div>
++
++    <!-- 中奖弹窗 -->
++    <div id="prizeModal" class="modal">
++        <div class="modal-content">
++            <h2>🎉 恭喜中奖！</h2>
++            <div class="prize-image">
++                奖品图片
++            </div>
++            <div class="prize-name" id="prizeName"></div>
++            <button class="contact-button" onclick="contactService()">联系客服</button>
++            <button class="close-button" onclick="closeModal()">关闭</button>
++        </div>
++    </div>
++
++    <script>
++        // 奖品配置
++        const prizes = [
++            { name: '一等奖', angle: 337.5 },
++            { name: '二等奖', angle: 292.5 },
++            { name: '三等奖', angle: 247.5 },
++            { name: '四等奖', angle: 202.5 },
++            { name: '五等奖', angle: 157.5 },
++            { name: '六等奖', angle: 112.5 },
++            { name: '七等奖', angle: 67.5 },
++            { name: '八等奖', angle: 22.5 }
++        ];
++
++        let isSpinning = false;
++        let currentRotation = 0;
++
++        // 抽奖函数
++        function spin() {
++            if (isSpinning) return;
++            
++            isSpinning = true;
++            const pointer = document.querySelector('.pointer');
++            pointer.style.pointerEvents = 'none';
++
++            // 随机选择一个奖品
++            const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
++            
++            // 计算旋转角度（多转几圈 + 目标角度）
++            const spins = 5; // 转5圈
++            const targetAngle = randomPrize.angle;
++            const finalRotation = (360 * spins) + targetAngle;
++            
++            const wheel = document.getElementById('wheel');
++            wheel.style.transform = `rotate(${finalRotation}deg)`;
++            
++            // 5秒后显示结果
++            setTimeout(() => {
++                showPrize(randomPrize);
++                isSpinning = false;
++                pointer.style.pointerEvents = 'auto';
++            }, 5000);
++        }
++
++        // 显示中奖弹窗
++        function showPrize(prize) {
++            const modal = document.getElementById('prizeModal');
++            const prizeName = document.getElementById('prizeName');
++            
++            prizeName.textContent = `您获得了：${prize.name}`;
++            modal.style.display = 'block';
++        }
++
++        // 关闭弹窗
++        function closeModal() {
++            const modal = document.getElementById('prizeModal');
++            modal.style.display = 'none';
++        }
++
++        // 联系客服
++        function contactService() {
++            // 这里可以修改为您的客服链接
++            window.open('https://work.weixin.qq.com/kfid/kfc2c6ed5d3a8819b59', '_blank');
++        }
++
++        // 点击弹窗外部关闭
++        window.onclick = function(event) {
++            const modal = document.getElementById('prizeModal');
++            if (event.target === modal) {
++                closeModal();
++            }
++        }
++
++        // 动态更新参与人数
++        setInterval(() => {
++            const countElement = document.getElementById('participantCount');
++            let currentCount = parseInt(countElement.textContent);
++            countElement.textContent = currentCount + Math.floor(Math.random() * 5) + 1;
++        }, 3000);
++    </script>
++</body>
++</html>
