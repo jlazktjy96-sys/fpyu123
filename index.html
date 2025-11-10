@@ -87,6 +87,20 @@
             position: relative;
             background: radial-gradient(circle at 50% 50%, #fff6da 0%, #fff0c2 60%, #ffe7a3 100%); /* 内圈米黄 */
             box-shadow: inset 0 0 20px rgba(0,0,0,0.08);
+            --segment-angle: 45deg; /* 8 等分，用于分隔线 */
+        }
+
+        /* 分隔线：每 45 度一条细线，让每个奖品区清晰可见 */
+        .wheel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            pointer-events: none;
+            background: repeating-conic-gradient(
+                rgba(255,255,255,0.9) 0 1deg,
+                transparent 1deg var(--segment-angle)
+            );
         }
 
         .wheel-section {
@@ -407,16 +421,22 @@
             chances--;
             spinButton.textContent = `抽奖中`;
 
-            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = 360 / prizes.length;
-            const targetAngle = 360 * 5 + (270 - (segmentAngle * randomPrizeIndex + segmentAngle / 2));
-
+            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
+            // 目标让该分区中心落在顶部 270deg（箭头位置）
+            const centerAngle = segmentAngle * randomPrizeIndex + segmentAngle / 2; // 相对 0deg（右侧）
+            const spins = 5; // 旋转圈数
+            const targetAngle = spins * 360 + (270 - centerAngle);
             currentRotation += targetAngle;
             wheelContainer.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
                 isSpinning = false;
-                showPrize(prizes[randomPrizeIndex]);
+                // 根据最终角度反算中奖分区，确保与箭头指向一致
+                const end = ((currentRotation % 360) + 360) % 360; // 0-359
+                const offsetFromTop = (270 - end + 360) % 360; // 以顶部为零点的偏移
+                const indexByRotation = Math.floor((offsetFromTop + segmentAngle / 2) / segmentAngle) % prizes.length;
+                showPrize(prizes[indexByRotation]);
                 if (chances > 0) {
                     spinButton.textContent = `抽奖`;
                 } else {
