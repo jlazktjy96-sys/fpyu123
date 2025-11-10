@@ -52,8 +52,8 @@
         /* 转盘容器 */
         .wheel-wrapper {
             position: relative;
-            width: 450px;
-            height: 450px;
+            width: 470px;
+            height: 470px;
             margin: 0 auto 30px;
         }
 
@@ -63,8 +63,20 @@
             height: 100%;
             border-radius: 50%;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.2);
             transition: transform 5s cubic-bezier(0.23, 1, 0.32, 1);
+            background: #f7c54a; /* 外圈金黄 */
+            padding: 22px; /* 留出内圈空间 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25), inset 0 0 30px rgba(0,0,0,0.15);
+        }
+
+        /* 白色圆点装饰圈 */
+        .wheel-container::after {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            border-radius: 50%;
+            border: 6px dotted #fff; /* 近似白色圆点效果 */
+            pointer-events: none;
         }
 
         /* 转盘 */
@@ -73,6 +85,8 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
+            background: radial-gradient(circle at 50% 50%, #fff6da 0%, #fff0c2 60%, #ffe7a3 100%); /* 内圈米黄 */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.08);
         }
 
         .wheel-section {
@@ -91,8 +105,9 @@
 
         .wheel-section span {
             transform: rotate(-22.5deg);
-            margin-left: 30px;
+            margin-left: 38px; /* 更靠外圈，贴近参考样式 */
             font-size: 16px;
+            color: #333;
         }
 
         /* 指针 */
@@ -101,20 +116,22 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle, #FFD700, #FFA500);
+            width: 110px;
+            height: 110px;
+            background: radial-gradient(circle at 50% 35%, #ff7a3d 0%, #ff6a00 60%, #ff4d00 100%);
             border-radius: 50%;
             z-index: 100;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
-            color: #c0392b;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.35);
             transition: all 0.3s ease;
+            border: 6px solid rgba(255,255,255,0.85);
         }
 
         .pointer:hover {
@@ -275,7 +292,7 @@
             <div class="wheel-container" id="wheel-container">
                 <div class="wheel" id="wheel"></div>
             </div>
-            <div class="pointer" id="spin-button">抽奖</div>
+            <div class="pointer" id="spin-button">开始抽奖</div>
         </div>
 
         <!-- 分享功能已移除 -->
