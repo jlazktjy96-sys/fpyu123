@@ -20,17 +20,17 @@ body {
 /* 顶部横幅 */
 .hero {
   text-align: center;
-  padding: 24px 16px 8px;
+  padding: 28px 16px 8px;
   color: #fff;
 }
 .hero .title-cn {
-  font-size: 36px;
+  font-size: 48px;
   font-weight: 900;
   letter-spacing: 4px;
-  text-shadow: 0 4px 0 rgba(0,0,0,.2);
+  text-shadow: 0 6px 0 rgba(0,0,0,.2), 0 0 12px rgba(255,255,255,.15);
 }
 .hero .title-en {
-  margin-top: 4px;
+  margin-top: 10px;
   font-weight: 700;
   letter-spacing: 2px;
 }
@@ -48,6 +48,7 @@ body {
   width: 340px;
   height: 340px;
   margin: 16px auto 8px;
+  filter: drop-shadow(0 16px 24px rgba(0,0,0,.35));
 }
 
 .spinner {
@@ -64,16 +65,14 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  /* 8扇区配色，可根据奖品数量调整 */
+  /* 6扇区配色，与需求的6个奖品对应 */
   background: conic-gradient(
-    var(--gold-2) 0deg 45deg,
-    var(--gold) 45deg 90deg,
-    var(--gold-2) 90deg 135deg,
-    var(--gold) 135deg 180deg,
-    var(--gold-2) 180deg 225deg,
-    var(--gold) 225deg 270deg,
-    var(--gold-2) 270deg 315deg,
-    var(--gold) 315deg 360deg
+    var(--gold-2) 0deg 60deg,
+    var(--gold) 60deg 120deg,
+    var(--gold-2) 120deg 180deg,
+    var(--gold) 180deg 240deg,
+    var(--gold-2) 240deg 300deg,
+    var(--gold) 300deg 360deg
   );
   border: 12px solid #fff6cc;
 }
@@ -89,35 +88,37 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 72px;
-  height: 72px;
-  transform: rotate(var(--angle)) translate(128px) rotate(calc(-1 * var(--angle)));
+  width: 70px;
+  height: 70px;
+  transform: rotate(var(--angle)) translate(130px) rotate(calc(-1 * var(--angle)));
   transform-origin: center;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .icons img {
-  width: 64px;
-  height: 64px;
+  width: 62px;
+  height: 62px;
   object-fit: cover;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 6px 16px rgba(0,0,0,.25);
 }
 .icons .label {
-  width: 64px;
-  height: 64px;
+  width: 62px;
+  height: 62px;
   border-radius: 12px;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 13px;
+  line-height: 1.1;
   color: #333;
   box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
 }
 
 .pointer {
@@ -151,7 +152,15 @@ body {
 }
 .spin-btn:disabled { opacity: .6; cursor: not-allowed; }
 
-.join-count { color: #fff; opacity: .9; }
+.join-count { 
+  display: inline-block; 
+  margin-top: 8px; 
+  padding: 8px 18px; 
+  background: #ffd84a; 
+  color: #8b3f00; 
+  border-radius: 999px; 
+  font-weight: 800; 
+}
 
 /* 奖品展示 */
 .prize-show { background: #fff; border-radius: 12px; margin-top: 16px; padding: 12px; }
@@ -182,4 +191,3 @@ body {
 @media (max-width: 640px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
 }
-
