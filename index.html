@@ -1,185 +1,73 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>幸运大转盘 BEST LUCKY</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #c0392b; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>幸运大转盘 · Best Lucky</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="title-cn">幸运大转盘</div>
+      <div class="title-en">BEST LUCKY</div>
+    </header>
 
-        .main-container { width: 100%; max-width: 420px; padding: 16px; text-align: center; }
-        .banner { color: #fff; font-weight: 800; font-size: 28px; letter-spacing: 2px; margin-bottom: 10px; text-shadow: 3px 3px 6px rgba(0,0,0,0.25); }
-        .subtitle { color: rgba(255,255,255,0.9); margin-bottom: 18px; }
-
-        /* 轮盘 */
-        .wheel-wrapper { position: relative; width: 320px; height: 320px; margin: 0 auto 10px; }
-        .wheel-container { position: relative; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; transition: transform 5s cubic-bezier(0.23,1,0.32,1); background: #f7c54a; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.25), inset 0 0 30px rgba(0,0,0,0.15); }
-        .wheel-container::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 4px dotted #fff; pointer-events: none; }
-
-        .wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; background: radial-gradient(circle at 50% 50%, #fff6da 0%, #fff0c2 60%, #ffe7a3 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.08); --segment-angle: 45deg; }
-        .wheel::before { content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: repeating-conic-gradient( rgba(255,255,255,0.9) 0 1deg, transparent 1deg var(--segment-angle) ); }
-
-        .wheel-section { position: absolute; width: 50%; height: 50%; transform-origin: right bottom; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: #333; }
-        .section-content { transform: rotate(-22.5deg); margin-left: 22px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .section-img { width: 34px; height: 34px; object-fit: contain; }
-        .wheel-section span { font-size: 13px; color: #333; }
-
-        .pointer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 76px; height: 76px; background: radial-gradient(circle at 50% 35%, #ff7a3d 0%, #ff6a00 60%, #ff4d00 100%); border-radius: 50%; z-index: 100; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.25); box-shadow: 0 8px 16px rgba(0,0,0,0.35); border: 4px solid rgba(255,255,255,0.85); }
-        .pointer:hover { transform: translate(-50%, -50%) scale(1.08); }
-        .pointer::after { content: ''; position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 16px solid rgba(255,255,255,0.95); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25)); }
-
-        .action-buttons { display: flex; justify-content: center; gap: 14px; margin-top: 10px; }
-
-        /* 奖品一览 */
-        .prize-gallery { margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 16px; }
-        .prize-gallery h3 { color: #fff; margin-bottom: 12px; }
-        .prize-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .prize-item { background: #fff; border-radius: 12px; padding: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .prize-item img { width: 100%; max-width: 90px; height: auto; margin-bottom: 8px; }
-        .prize-item p { font-weight: bold; color: #333; }
-
-        /* 弹窗 */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
-        .modal-content { background: #fff; margin: 15% auto; padding: 26px; border-radius: 16px; width: 92%; max-width: 480px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .modal h2 { color: #c0392b; margin-bottom: 12px; }
-        .prize-name { font-size: 20px; color: #c0392b; font-weight: bold; margin: 10px 0 14px; }
-        .prize-image { width: 96px; height: 96px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: block; margin: 8px auto 12px; }
-        .modal-button { padding: 12px 22px; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; min-width: 120px; margin: 6px; }
-        .close-btn { background: #f0f0f0; color: #333; }
-        .contact-btn { background: linear-gradient(45deg, #FFD700, #FFA500); color: #c0392b; text-decoration: none; display: inline-block; }
-    </style>
-</head>
-<body>
-    <div class="main-container">
-        <div class="banner">幸运大转盘 · BEST LUCKY</div>
-        <div class="subtitle">试试您的运气，赢取丰厚奖品！</div>
-
-        <div class="wheel-wrapper">
-            <div class="wheel-container" id="wheel-container">
-                <div class="wheel" id="wheel"></div>
-            </div>
-            <div class="pointer" id="spin-button">开始抽奖</div>
+    <main class="container">
+      <!-- 转盘 -->
+      <section class="wheel-section">
+        <div class="wheel" aria-label="幸运转盘">
+          <div class="pointer" aria-hidden="true"></div>
+          <div id="spinner" class="spinner">
+            <div class="sectors" aria-hidden="true"></div>
+            <ul id="wheelIcons" class="icons" aria-hidden="false"></ul>
+          </div>
+          <button id="spinBtn" class="spin-btn" type="button">开始抽奖</button>
         </div>
+        <p class="join-count">已<span id="joinCount">1062</span>人参与</p>
+      </section>
 
-        <div class="prize-gallery">
-            <h3>奖品一览</h3>
-            <div class="prize-grid" id="prize-grid"></div>
+      <!-- 奖品展示 -->
+      <section class="prize-show">
+        <div class="tabs">
+          <div class="tab active">活动奖品</div>
+          <div class="tab">抽奖规则</div>
+          <div class="tab">中奖查询</div>
         </div>
+        <div class="grid">
+          <div class="card">
+            <img src="assets/iphone.png" alt="一等奖 苹果手机" />
+            <div class="name">一等奖 苹果手机</div>
+          </div>
+          <div class="card">
+            <img src="assets/scooter.png" alt="二等奖 平衡车" />
+            <div class="name">二等奖 平衡车</div>
+          </div>
+          <div class="card">
+            <img src="assets/headset.png" alt="三等奖 耳机" />
+            <div class="name">三等奖 耳机</div>
+          </div>
+          <div class="card">
+            <img src="assets/cup.png" alt="四等奖 水杯" />
+            <div class="name">四等奖 水杯</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 中奖弹窗 -->
+    <div id="winModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="winTitle" hidden>
+      <div class="modal-content">
+        <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+        <h2 id="winTitle">恭喜中奖！</h2>
+        <div class="win-box">
+          <img id="winImg" src="" alt="中奖奖品" />
+          <p id="winName" class="win-name"></p>
+        </div>
+        <a id="contactBtn" class="contact-btn" href="#" target="_blank" rel="noopener">联系客服领取奖励</a>
+      </div>
     </div>
 
-    <div id="prizeModal" class="modal">
-        <div class="modal-content">
-            <h2>🎉 恭喜您中奖了！</h2>
-            <img id="prizeImage" class="prize-image" src="" alt="奖品图片" />
-            <div class="prize-name" id="prizeName"></div>
-            <a class="modal-button contact-btn" id="contact-btn" href="#" target="_blank">联系客服领取</a>
-            <button class="modal-button close-btn" onclick="closeModal()">关闭</button>
-        </div>
-    </div>
+    <script src="script.js"></script>
+  </body>
+  </html>
 
-    <script>
-        // 奖品配置（顶部转盘与底部“奖品一览”共享）
-        const prizes = [
-            { name: '特等奖 苹果笔记本电脑', color: '#ffd7a3', image: 'https://img.icons8.com/fluency/96/macbook.png' },
-            { name: '一等奖 苹果手机',       color: '#fff1c6', image: 'https://img.icons8.com/fluency/96/iphone-x.png' },
-            { name: '二等奖 平衡车',           color: '#ffd7a3', image: 'https://img.icons8.com/fluency/96/electric-scooter.png' },
-            { name: '三等奖 炫酷耳机',         color: '#fff1c6', image: 'https://img.icons8.com/color/96/headphones.png' },
-            { name: '四等奖 精致水杯',         color: '#ffd7a3', image: 'https://img.icons8.com/fluency/96/water-bottle.png' },
-            { name: '谢谢参与',                 color: '#fff1c6', image: 'https://img.icons8.com/color/96/cancel.png' },
-            { name: '再接再厉',                 color: '#ffd7a3', image: 'https://img.icons8.com/fluency/96/retry.png' },
-            { name: '未中奖',                   color: '#fff1c6', image: 'https://img.icons8.com/color/96/delete-sign.png' }
-        ];
-
-        let isSpinning = false;
-        let chances = 3; // 可按需调整，截图里通常为可多次
-        let currentRotation = 0;
-
-        const wheel = document.getElementById('wheel');
-        const prizeGrid = document.getElementById('prize-grid');
-        const spinButton = document.getElementById('spin-button');
-        const wheelContainer = document.getElementById('wheel-container');
-
-        function createWheel() {
-            const segmentAngle = 360 / prizes.length;
-            prizes.forEach((prize, index) => {
-                const segment = document.createElement('div');
-                segment.className = 'wheel-section';
-                segment.style.transform = `rotate(${segmentAngle * index}deg)`;
-                segment.style.clipPath = `polygon(50% 50%, 100% 0, 100% 100%)`;
-                segment.style.backgroundColor = prize.color;
-
-                const content = document.createElement('div');
-                content.className = 'section-content';
-
-                const img = document.createElement('img');
-                img.className = 'section-img';
-                img.src = prize.image;
-                img.alt = prize.name;
-
-                const label = document.createElement('span');
-                label.textContent = prize.name;
-
-                content.appendChild(img);
-                content.appendChild(label);
-                segment.appendChild(content);
-                wheel.appendChild(segment);
-            });
-        }
-
-        function createPrizeGallery() {
-            prizes.slice(0,5).forEach(prize => { // 只展示前五个主奖项
-                const item = document.createElement('div');
-                item.className = 'prize-item';
-                item.innerHTML = `<img src="${prize.image}" alt="${prize.name}"><p>${prize.name}</p>`;
-                prizeGrid.appendChild(item);
-            });
-        }
-
-        function startSpin() {
-            if (isSpinning || chances <= 0) return;
-            isSpinning = true;
-            chances--;
-            spinButton.textContent = '抽奖中';
-
-            const segmentAngle = 360 / prizes.length;
-            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
-            const centerAngle = segmentAngle * randomPrizeIndex + segmentAngle / 2; // 分区中心
-            const spins = 5;
-            const targetAngle = spins * 360 + (270 - centerAngle); // 顶部270度为箭头位置
-            currentRotation += targetAngle;
-            wheelContainer.style.transform = `rotate(${currentRotation}deg)`;
-
-            setTimeout(() => {
-                isSpinning = false;
-                const end = ((currentRotation % 360) + 360) % 360; // 0-359
-                const offsetFromTop = (270 - end + 360) % 360;
-                const indexByRotation = Math.floor((offsetFromTop + segmentAngle / 2) / segmentAngle) % prizes.length;
-                showPrize(prizes[indexByRotation]);
-                spinButton.textContent = chances > 0 ? '开始抽奖' : '无机会';
-                spinButton.disabled = chances <= 0;
-            }, 5000);
-        }
-
-        function showPrize(prize) {
-            const modal = document.getElementById('prizeModal');
-            const prizeName = document.getElementById('prizeName');
-            const prizeImage = document.getElementById('prizeImage');
-            const contactBtn = document.getElementById('contact-btn');
-            prizeName.textContent = `恭喜您获得：${prize.name}`;
-            prizeImage.src = prize.image;
-            contactBtn.href = customerServiceUrl; // 可自定义链接
-            modal.style.display = 'block';
-        }
-
-        function closeModal() { document.getElementById('prizeModal').style.display = 'none'; }
-
-        spinButton.addEventListener('click', startSpin);
-        createWheel();
-        createPrizeGallery();
-
-        // 客服链接：按需修改为你自己的地址
-        const customerServiceUrl = 'https://example.com/contact';
-    </script>
-</body>
-</html>
