@@ -1,1 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>幸运转盘抽奖</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="title-cn">幸运转盘抽奖</div>
+      <div class="title-en">BEST LUCKY</div>
+    </header>
+
+    <main class="container">
+      <!-- 转盘区域 -->
+      <section class="wheel-section">
+        <div class="wheel" aria-label="幸运转盘">
+          <div class="pointer" aria-hidden="true"></div>
+          <div id="spinner" class="spinner">
+            <div class="sectors" aria-hidden="true"></div>
+            <ul id="wheelIcons" class="icons" aria-hidden="false"></ul>
+          </div>
+          <button id="spinBtn" class="spin-btn" type="button">开始抽奖</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- 中奖弹窗 -->
+    <div id="winModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="winTitle" hidden>
+      <div class="modal-content">
+        <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+        <h2 id="winTitle">恭喜中奖！</h2>
+        <div class="win-box">
+          <img id="winImg" src="" alt="中奖奖品" />
+          <p id="winName" class="win-name"></p>
+        </div>
+        <a id="contactBtn" class="contact-btn" href="#" target="_blank" rel="noopener">联系客户领取</a>
+      </div>
+    </div>
+
+    <footer class="tips">
+      <p>提示：奖品图片可在 <a href="https://image.baidu.com/" target="_blank" rel="noopener">百度图片</a> 搜索后，替换脚本中的图片链接。</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+  </html>
 
