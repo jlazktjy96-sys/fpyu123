@@ -1,1 +1,169 @@
+/* 基础样式与主题 */
+:root {
+  --bg-red: #ff2a2a;
+  --bg-red-dark: #cc1f1f;
+  --gold: #ffd65a;
+  --gold-2: #ffe69b;
+  --white: #ffffff;
+  --shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  color: #222;
+  background: linear-gradient(180deg, var(--bg-red) 0%, var(--bg-red-dark) 100%);
+}
+
+/* 顶部横幅 */
+.hero {
+  text-align: center;
+  padding: 28px 16px 8px;
+  color: #fff;
+}
+.hero .title-cn {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-shadow: 0 6px 0 rgba(0,0,0,.2), 0 0 12px rgba(255,255,255,.15);
+}
+.hero .title-en {
+  margin-top: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px 64px;
+}
+
+/* 转盘区域 */
+.wheel-section { text-align: center; }
+.wheel {
+  position: relative;
+  width: 340px;
+  height: 340px;
+  margin: 16px auto 8px;
+  filter: drop-shadow(0 16px 24px rgba(0,0,0,.35));
+}
+
+.spinner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  background: #f9f9f9;
+  overflow: hidden;
+  transform: rotate(-90deg); /* 让0度指向上方，便于与指针对齐 */
+}
+
+.sectors {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* 6扇区配色，与需求的6个奖品对应 */
+  background: conic-gradient(
+    var(--gold-2) 0deg 60deg,
+    var(--gold) 60deg 120deg,
+    var(--gold-2) 120deg 180deg,
+    var(--gold) 180deg 240deg,
+    var(--gold-2) 240deg 300deg,
+    var(--gold) 300deg 360deg
+  );
+  border: 12px solid #fff6cc;
+}
+
+.icons {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  inset: 0;
+}
+.icons li {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70px;
+  height: 70px;
+  transform: rotate(var(--angle)) translate(130px) rotate(calc(-1 * var(--angle)));
+  transform-origin: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icons .label {
+  width: 62px;
+  height: 62px;
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  font-size: 13px;
+  line-height: 1.1;
+  color: #333;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
+}
+
+.pointer {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 22px solid #ffef8f;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.3));
+}
+
+.spin-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: none;
+  font-size: 20px;
+  font-weight: 800;
+  color: #a14d00;
+  background: radial-gradient(circle at 30% 30%, #ffe7a6, #ffc94b);
+  box-shadow: 0 10px 20px rgba(0,0,0,.35);
+  cursor: pointer;
+}
+.spin-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* 中奖弹窗 */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: grid; place-items: center; }
+.modal[hidden] { display: none; }
+.modal-content {
+  width: 90vw; max-width: 440px; background: #fff; border-radius: 14px; padding: 16px; box-shadow: var(--shadow); position: relative;
+}
+.modal-close { position: absolute; right: 16px; top: 10px; border: none; background: transparent; font-size: 24px; cursor: pointer; }
+.win-box { display: grid; place-items: center; gap: 8px; margin: 10px 0 16px; }
+.win-box img { width: 160px; height: 160px; object-fit: contain; background: #f8f8f8; border-radius: 12px; display: none; }
+.win-name { font-size: 16px; font-weight: 700; }
+.contact-btn {
+  display: block; text-align: center; padding: 12px; border-radius: 8px; color: #a14d00; text-decoration: none; font-weight: 800;
+  background: linear-gradient(180deg, #ffeaa8, #ffc84a);
+}
+
+.tips { color: #fff; text-align: center; padding: 8px 0 24px; }
+.tips a { color: #fff; text-decoration: underline; }
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .hero .title-cn { font-size: 36px; }
+}
 
