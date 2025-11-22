@@ -32,6 +32,9 @@
     .grid .box { border-top: 1px dashed var(--border); padding-top: 10px; }
     .hint { padding: 12px; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--border); }
     .stat { margin-left:auto; color: var(--muted); font-size:12px; }
+    .footer { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+    pre { background: #f7f9fb; border: 1px solid var(--border); border-radius: 10px; padding: 12px; overflow: auto; }
+    .dark pre { background:#0f141b; color:#d9e2ec; border-color: var(--border); }
   </style>
 </head>
 <body>
@@ -424,12 +427,25 @@
 
   document.addEventListener('DOMContentLoaded', () => { loadSettings(); renderPackList(); render(); });
 </script>
+  <div class="footer">
+    <div class="card">
+      <div class="toolbar"><strong>部署与客户端下载</strong></div>
+      <div style="padding:12px;">
+        <div style="margin-bottom:10px; color:var(--muted);">连接服务器</div>
+        <pre><code>ssh root@0.0.0.0 -p 22</code></pre>
+
+        <div style="margin:16px 0 10px; color:var(--muted);">安装 S-UI</div>
+        <pre><code>VERSION=1.2.2 && bash &lt;(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/$VERSION/install.sh) $VERSION</code></pre>
+
+        <div style="margin:16px 0 8px; color:var(--muted);">客户端下载</div>
+        <ul style="margin:0; padding-left:18px; line-height:1.8;">
+          <li>电脑端 Windows/Mac（v2rayN）：<a href="https://github.com/2dust/v2rayN/releases/tag/7.12.7" target="_blank" rel="noopener noreferrer">https://github.com/2dust/v2rayN/releases/tag/7.12.7</a></li>
+          <li>安卓 Android（NekoBox）：<a href="https://github.com/MatsuriDayo/NekoBoxForAndroid/releases/tag/1.3.9" target="_blank" rel="noopener noreferrer">https://github.com/MatsuriDayo/NekoBoxForAndroid/releases/tag/1.3.9</a></li>
+          <li>苹果 iOS/Mac（Shadowrocket）：<a href="https://apps.apple.com/app/shadowrocket/id932747118" target="_blank" rel="noopener noreferrer">https://apps.apple.com/app/shadowrocket/id932747118</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
-<br><p></h1>1                              连接服务器ssh root@154.205.159.223 -p 22</h1></p><br>
-<body><p>1                              <安装S-UI</p><body>
-<p><br></h1>1                              VERSION=1.2.2 && bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/$VERSION/install.sh) $VERSION</h1><br></p>
-<p><br> <p>1                              电脑端Windows/Mac（v2rayN）：<a href=https://github.com/2dust/v2rayN/releases/tag/7.12.7 target="_blank">https://github.com/2dust/v2rayN/releases/tag/7.12.7</a><br></p>
-<p> <body>1                              安卓Android（NekoBox）：<a href=https://github.com/MatsuriDayo/NekoBoxForAndroid/releases/tag/1.3.9 target="_blank">"https://github.com/MatsuriDayo/NekoBoxForAndroid/releases/tag/1.3.9</a><br></p>
-<p> <body>1                              苹果IOS/Mac（shadowrocket）：<a href=https://apps.apple.com/app/shadowrocket/id932747118 target="_blank">"https://apps.apple.com/app/shadowrocket/id932747118</a></p><body></p>
-<br>
+ 
