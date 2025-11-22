@@ -440,6 +440,17 @@
         <div style="margin:16px 0 10px; color:var(--muted);">安装 S-UI</div>
         <pre><code>VERSION=1.2.2 && bash &lt;(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/$VERSION/install.sh) $VERSION</code></pre>
 
+        <div style="margin-bottom:10px; color:var(--muted);">卸载 S-UI</div>
+        <pre><code>sudo -i
+
+systemctl disable s-ui  --now
+
+rm -f /etc/systemd/system/sing-box.service
+systemctl daemon-reload
+
+rm -fr /usr/local/s-ui
+rm /usr/bin/s-ui</code></pre>
+
         <div style="margin:16px 0 8px; color:var(--muted);">客户端下载</div>
         <ul style="margin:0; padding-left:18px; line-height:1.8;">
           <li>电脑端 Windows/Mac（v2rayN）：<a href="https://github.com/2dust/v2rayN/releases/tag/7.12.7" target="_blank" rel="noopener noreferrer">https://github.com/2dust/v2rayN/releases/tag/7.12.7</a></li>
@@ -451,4 +462,4 @@
   </div>
 </body>
 </html>
- 
+
